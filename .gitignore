@@ -1,0 +1,32 @@
+﻿# Python environments and cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node dependencies and generated cache
+node_modules/
+**/node_modules/
+models/node-compile-cache/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Private input videos and captured data
+data/videos/*
+!data/videos/README.md
+data/capture/
+ai_uploads/
+*.mp4
+*.mov
+*.avi
+
+# Generated large geometry
+exports/mesh_frames/
+*.vmesh
+*.ply
+
+# Keep source, configuration, requirements, and small V4D examples tracked

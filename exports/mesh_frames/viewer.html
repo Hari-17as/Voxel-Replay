@@ -1,0 +1,70 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Voxel Replay - Mesh Viewer</title>
+<style>html,body{margin:0;height:100%;background:#14161b;overflow:hidden}
+#hud{position:fixed;left:12px;top:10px;color:#cfd3dc;font:13px system-ui}</style>
+<script type="importmap">{"imports":{
+"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body><div id="hud">Loading...</div>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {PLYLoader} from 'three/addons/loaders/PLYLoader.js';
+
+const hud = document.getElementById('hud');
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x14161b);
+const camera = new THREE.PerspectiveCamera(35, innerWidth/innerHeight, 0.05, 50);
+camera.up.set(0,0,1);
+camera.position.set(0.0,-4.2,1.5);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0,0,1.0);
+controls.enableDamping = true;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444455, 1.1));
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(2,-3,4); scene.add(key);
+const rim = new THREE.DirectionalLight(0xaaccff, 0.8); rim.position.set(-3,3,2); scene.add(rim);
+
+const grid = new THREE.GridHelper(4, 16, 0x333844, 0x22262f);
+grid.rotation.x = Math.PI/2; scene.add(grid);
+
+const mat = new THREE.MeshStandardMaterial({vertexColors:true, roughness:0.85, metalness:0.0});
+const mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat);
+scene.add(mesh);
+
+const info = await (await fetch('frames.json')).json();
+const loader = new PLYLoader();
+const geos = [];
+const c = new THREE.Color();
+for (let i = 0; i < info.files.length; i++) {
+  const g = await loader.loadAsync(info.files[i]);
+  const col = g.attributes.color;
+  for (let k = 0; k < col.count; k++) {
+    c.fromBufferAttribute(col, k).convertSRGBToLinear();
+    col.setXYZ(k, c.r, c.g, c.b);
+  }
+  geos.push(g);
+  hud.textContent = 'Loading ' + (i+1) + '/' + info.files.length;
+  if (i === 0) mesh.geometry = g;
+}
+
+let t0 = performance.now();
+function loop(now) {
+  const i = Math.floor(((now - t0) / 1000) * info.fps) % geos.length;
+  mesh.geometry = geos[i];
+  hud.textContent = 'frame ' + (i+1) + '/' + geos.length + '  (drag = orbit, wheel = zoom)';
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script></body></html>

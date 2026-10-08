@@ -1,0 +1,37 @@
+{
+  "base_v4d": {
+    "file": "exports\\reconstructed.v4d",
+    "bytes": 1055268,
+    "kilobytes": 1030.54,
+    "frames": 30,
+    "fps": 15.0,
+    "grid": [
+      64,
+      44,
+      48
+    ],
+    "total_voxel_records": 175834,
+    "decode_seconds": 0.026708
+  },
+  "color_v4d": {
+    "file": "exports\\reconstructed_color.v4d",
+    "bytes": 1055268,
+    "kilobytes": 1030.54,
+    "frames": 30,
+    "fps": 15.0,
+    "grid": [
+      64,
+      44,
+      48
+    ],
+    "total_voxel_records": 175834,
+    "decode_seconds": 0.034869
+  },
+  "held_out_mean_silhouette_iou": 0.5672,
+  "notes": [
+    "Synthetic multi-camera development benchmark.",
+    "heldout camera excluded from reconstruction and color assignment.",
+    "Do not present 0.5672 as real-world accuracy."
+  ],
+  "color_size_change_percent": 0.0
+}
